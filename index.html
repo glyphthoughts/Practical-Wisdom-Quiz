@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>GlyphThoughts • Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        /* Text selection disable + reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'VT323', monospace;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Dimmer stars */
+        .pixel {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #fff;
+            opacity: 0.29;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes twinkle {
+            from {
+                opacity: 0.1;
+                transform: scale(1);
+            }
+
+            to {
+                opacity: 0.49;
+                transform: scale(1.5);
+            }
+        }
+
+        /* Quiz container */
+        #quiz {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        #question {
+            font-size: 2rem;
+            line-height: 1.4;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+        }
+
+        .answer {
+            display: block;
+            width: 100%;
+            max-width: 420px;
+            margin: 0.5rem auto;
+            padding: 0.8rem 1rem;
+            background: rgba(17, 17, 17, 0.5) !important;
+            border: 1px solid rgba(68, 68, 68, 0.5) !important;
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: background 0.3s, opacity 0.8s ease-out, transform 0.8s ease-out;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Button text container for smooth transitions */
+        .answer-text {
+            opacity: 1;
+            transition: opacity 0.4s ease-out;
+        }
+
+        .answer-text.fade-out {
+            opacity: 0;
+        }
+
+        /* Disabled state for buttons */
+        .answer.disabled {
+            cursor: not-allowed !important;
+            opacity: 0.3 !important;
+        }
+
+        .answer:not(.disabled):hover {
+            background: rgba(34, 34, 34, 0.7) !important;
+        }
+
+        .answer.selected {
+            background: rgba(68, 68, 68, 0.8) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+        }
+
+        /* Ending screen */
+        .ending-screen {
+            display: none;
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .thank-you-text,
+        .philosopher-text,
+        .certificate-text {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .thank-you-text {
+            font-size: 2.5rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+        }
+
+        .philosopher-text {
+            font-size: 1.8rem;
+            margin: 1.5rem 0;
+            color: #ccc;
+        }
+
+        .certificate-text {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            color: #aaa;
+        }
+
+        .claim-button {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            background: rgba(17, 17, 17, 0.5);
+            border: 1px solid rgba(68, 68, 68, 0.5);
+            color: #fff;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            cursor: pointer;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: background 0.3s, transform 0.2s, opacity 0.8s ease-out;
+        }
+
+        .claim-button:hover {
+            background: rgba(34, 34, 34, 0.7);
+            transform: translateY(-2px);
+        }
+
+        /* Initial loading state */
+        .initial-load #question,
+        .initial-load .answer {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+    </style>
+</head>
+
+<body class="initial-load">
+    <!-- Stars -->
+    <div id="stars"></div>
+
+    <!-- Quiz -->
+    <div id="quiz">
+        <div id="question">Loading...</div>
+        <button class="answer disabled" onclick="selectAnswer(this, 0)">
+            <span class="answer-text">Loading...</span>
+        </button>
+        <button class="answer disabled" onclick="selectAnswer(this, 1)">
+            <span class="answer-text">Loading...</span>
+        </button>
+        <button class="answer disabled" onclick="selectAnswer(this, 2)">
+            <span class="answer-text">Loading...</span>
+        </button>
+    </div>
+
+    <!-- Ending Screen -->
+    <div id="ending" class="ending-screen">
+        <div class="thank-you-text">Thank you for taking the quiz</div>
+        <div class="philosopher-text">You are a great thinker</div>
+        <div class="certificate-text">Claim your certificate now</div>
+        <button class="claim-button" onclick="claimCertificate()">Claim Now</button>
+    </div>
+
+    <script>
+        /* Quiz Questions Data */
+        const questionsOriginal = [
+            {
+                title: "Facing Daily Obstacles",
+                question: "When you encounter a significant challenge, what's your natural response?",
+                answers: [
+                    "Accept it as an opportunity to build character and resilience",
+                    "Focus on what you can control and release attachment to outcomes",
+                    "View it as temporary and maintain perspective on life's bigger picture"
+                ]
+            },
+            {
+                title: "Defining a Good Life",
+                question: "What do you believe constitutes genuine fulfillment?",
+                answers: [
+                    "Living according to your highest values regardless of external rewards",
+                    "Finding peace through understanding your place in the natural order",
+                    "Developing wisdom through continuous self-examination and growth"
+                ]
+            },
+            {
+                title: "Dealing with Desire",
+                question: "How do you approach your wants and cravings?",
+                answers: [
+                    "Practice moderation and examine whether they serve your higher purpose",
+                    "Distinguish between what you need versus what you merely want",
+                    "Use them as teachers to understand your deeper motivations"
+                ]
+            },
+            {
+                title: "Responding to Criticism",
+                question: "When someone judges or criticizes you unfairly, you tend to:",
+                answers: [
+                    "Focus on whether their words contain any truth worth considering",
+                    "Remember that their opinion reflects their character, not yours",
+                    "Use it as practice for maintaining inner equilibrium"
+                ]
+            },
+            {
+                title: "The Nature of Control",
+                question: "In difficult situations, you find most peace by:",
+                answers: [
+                    "Identifying exactly what aspects you can influence",
+                    "Accepting the natural flow of events with grace",
+                    "Focusing your energy on your responses and choices"
+                ]
+            },
+            {
+                title: "Building Character",
+                question: "You believe strength of character develops best through:",
+                answers: [
+                    "Daily small acts of discipline and virtue",
+                    "Facing adversity with courage and wisdom",
+                    "Consistent self-reflection and honest self-assessment"
+                ]
+            },
+            {
+                title: "Legacy and Purpose",
+                question: "What matters most in how you live your life?",
+                answers: [
+                    "Acting with justice and integrity in all relationships",
+                    "Cultivating wisdom and sharing it with others",
+                    "Living authentically according to your philosophical principles"
+                ]
+            }
+        ];
+
+        /* Shuffle function - Fisher-Yates algorithm */
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        const questions = shuffleArray(questionsOriginal);
+        let currentQuestion = 0;
+        let answers = [];
+        let animationsComplete = false;
+        let isFirstLoad = true;
+
+        /* Generate dimmer stars */
+        const STAR_COUNT = 250;
+        const starField = document.getElementById('stars');
+        for (let i = 0; i < STAR_COUNT; i++) {
+            const s = document.createElement('div');
+            s.className = 'pixel';
+            s.style.top = Math.random() * 100 + 'vh';
+            s.style.left = Math.random() * 100 + 'vw';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            starField.appendChild(s);
+        }
+
+        /* PAGE LOAD ANIMATIONS */
+        window.addEventListener('load', () => {
+            // Remove initial loading class after a brief delay
+            setTimeout(() => {
+                document.body.classList.remove('initial-load');
+                loadQuestion();
+            }, 300);
+        });
+
+        function updateButtonText(button, newText, callback) {
+            const textSpan = button.querySelector('.answer-text');
+
+            // Fade out current text
+            textSpan.classList.add('fade-out');
+
+            // Change text and fade in after fade out completes
+            setTimeout(() => {
+                textSpan.textContent = newText;
+                textSpan.classList.remove('fade-out');
+                if (callback) callback();
+            }, 400); // Match the CSS transition duration
+        }
+
+        function loadQuestion() {
+            animationsComplete = false;
+
+            const questionEl = document.getElementById('question');
+            const buttons = document.querySelectorAll('.answer');
+            const q = questions[currentQuestion];
+
+            // Disable buttons initially
+            buttons.forEach(btn => btn.classList.add('disabled'));
+
+            if (isFirstLoad) {
+                // First load: everything starts from initial positions and fades in
+                isFirstLoad = false;
+
+                // Set initial content
+                questionEl.textContent = `${q.title} — ${q.question}`;
+                buttons.forEach((btn, index) => {
+                    const textSpan = btn.querySelector('.answer-text');
+                    textSpan.textContent = q.answers[index];
+                    btn.classList.remove('selected');
+                });
+
+                // Animate everything in smoothly
+                setTimeout(() => {
+                    questionEl.style.opacity = '1';
+                    questionEl.style.transform = 'translateY(0)';
+                }, 200);
+
+                buttons.forEach((btn, index) => {
+                    setTimeout(() => {
+                        btn.style.opacity = '1';
+                        btn.style.transform = 'translateY(0)';
+
+                        // Enable buttons after all animations complete
+                        if (index === buttons.length - 1) {
+                            setTimeout(() => {
+                                buttons.forEach(button => {
+                                    button.classList.remove('disabled');
+                                });
+                                animationsComplete = true;
+                            }, 800);
+                        }
+                    }, 600 + (index * 300));
+                });
+
+            } else {
+                // Subsequent loads: fade in with text transition
+
+                // Reset positions
+                questionEl.style.opacity = '0';
+                questionEl.style.transform = 'translateY(20px)';
+                buttons.forEach(btn => {
+                    btn.style.opacity = '0';
+                    btn.style.transform = 'translateY(20px)';
+                    btn.classList.remove('selected');
+                });
+
+                // Update question
+                setTimeout(() => {
+                    questionEl.textContent = `${q.title} — ${q.question}`;
+                    questionEl.style.opacity = '1';
+                    questionEl.style.transform = 'translateY(0)';
+                }, 300);
+
+                // Update buttons with smooth text transitions
+                let completedAnimations = 0;
+                buttons.forEach((btn, index) => {
+                    setTimeout(() => {
+                        updateButtonText(btn, q.answers[index], () => {
+                            btn.style.opacity = '1';
+                            btn.style.transform = 'translateY(0)';
+
+                            completedAnimations++;
+                            if (completedAnimations === buttons.length) {
+                                setTimeout(() => {
+                                    buttons.forEach(button => {
+                                        button.classList.remove('disabled');
+                                    });
+                                    animationsComplete = true;
+                                }, 600);
+                            }
+                        });
+                    }, 800 + (index * 200));
+                });
+            }
+        }
+
+        let isTransitioning = false;
+
+        function selectAnswer(clickedBtn, clickedIndex) {
+            if (!animationsComplete || isTransitioning || clickedBtn.classList.contains('disabled')) {
+                return;
+            }
+
+            isTransitioning = true;
+            animationsComplete = false;
+
+            const allButtons = document.querySelectorAll('.answer');
+            allButtons.forEach(btn => btn.classList.add('disabled'));
+
+            answers.push(clickedIndex);
+            clickedBtn.classList.add('selected');
+
+            const questionEl = document.getElementById('question');
+
+            allButtons.forEach((btn, index) => {
+                if (index !== clickedIndex) {
+                    btn.style.opacity = '0';
+                    btn.style.transform = 'translateY(-20px)';
+                }
+            });
+
+            setTimeout(() => {
+                clickedBtn.style.opacity = '0';
+                clickedBtn.style.transform = 'translateY(-20px)';
+
+                setTimeout(() => {
+                    questionEl.style.opacity = '0';
+                    questionEl.style.transform = 'translateY(-30px)';
+
+                    setTimeout(() => {
+                        currentQuestion++;
+                        if (currentQuestion < questions.length) {
+                            loadQuestion();
+                            isTransitioning = false;
+                        } else {
+                            showEndingScreen();
+                        }
+                    }, 1000);
+                }, 600);
+            }, 600);
+        }
+
+        function showEndingScreen() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('ending').style.display = 'block';
+
+            const thankYou = document.querySelector('.thank-you-text');
+            const philosopher = document.querySelector('.philosopher-text');
+            const certificate = document.querySelector('.certificate-text');
+            const button = document.querySelector('.claim-button');
+
+            setTimeout(() => {
+                thankYou.style.opacity = '1';
+                thankYou.style.transform = 'translateY(0)';
+            }, 200);
+
+            setTimeout(() => {
+                philosopher.style.opacity = '1';
+                philosopher.style.transform = 'translateY(0)';
+            }, 600);
+
+            setTimeout(() => {
+                certificate.style.opacity = '1';
+                certificate.style.transform = 'translateY(0)';
+            }, 1000);
+
+            setTimeout(() => {
+                button.style.opacity = '1';
+                button.style.transform = 'translateY(0)';
+            }, 1400);
+
+            isTransitioning = false;
+        }
+
+        function claimCertificate() {
+            window.location.href = 'https://glyphthoughts.github.io/Practical-Wisdom-Certificate-Generation-Model';
+        }
+    </script>
+</body>
+
+</html>
