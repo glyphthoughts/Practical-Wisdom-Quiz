@@ -397,12 +397,11 @@
         let animationsComplete = false;
         let isFirstLoad = true;
 
-        // Responsive star count based on screen size
         const getStarCount = () => {
             const width = window.innerWidth;
-            if (width < 768) return 150; // Mobile
-            if (width < 1024) return 200; // Tablet
-            return 250; // Desktop
+            if (width < 768) return 150; 
+            if (width < 1024) return 200; 
+            return 250; 
         };
 
         const STAR_COUNT = getStarCount();
@@ -423,12 +422,9 @@
             }, 300);
         });
 
-        // Handle orientation changes and screen resizing
         window.addEventListener('resize', () => {
-            // Debounce resize events
             clearTimeout(window.resizeTimeout);
             window.resizeTimeout = setTimeout(() => {
-                // Re-position stars if needed
                 const stars = document.querySelectorAll('.pixel');
                 stars.forEach(star => {
                     star.style.top = Math.random() * 100 + 'vh';
