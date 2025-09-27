@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlyphThoughts • Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
@@ -21,14 +22,14 @@
             background: #000;
             color: #fff;
             font-family: 'VT323', monospace;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .pixel {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 2px;
+            height: 2px;
             background: #fff;
             opacity: 0.29;
             border-radius: 50%;
@@ -51,34 +52,39 @@
         #quiz {
             position: relative;
             z-index: 2;
-            max-width: 800px;
+            max-width: 90%;
+            width: 100%;
             margin: 0 auto;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: center;
-            padding: 0 1rem;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         #question {
-            font-size: 2rem;
+            font-size: clamp(1.2rem, 4vw, 2rem);
             line-height: 1.4;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             opacity: 0;
             transform: translateY(30px);
             transition: opacity 1s ease-out, transform 1s ease-out;
+            text-align: center;
+            max-width: 100%;
         }
 
         .answer {
             display: block;
             width: 100%;
-            max-width: 420px;
-            margin: 0.5rem auto;
-            padding: 0.8rem 1rem;
+            max-width: 100%;
+            margin: 0.4rem 0;
+            padding: clamp(0.6rem, 2vw, 0.8rem) clamp(0.8rem, 3vw, 1rem);
             background: rgba(17, 17, 17, 0.5) !important;
             border: 1px solid rgba(68, 68, 68, 0.5) !important;
             color: #fff;
             font-family: 'VT323', monospace;
-            font-size: 1.3rem;
+            font-size: clamp(1rem, 3vw, 1.3rem);
             cursor: pointer;
             opacity: 0;
             transform: translateY(30px);
@@ -86,6 +92,8 @@
             text-align: left;
             position: relative;
             overflow: hidden;
+            word-wrap: break-word;
+            hyphens: auto;
         }
 
         .answer-text {
@@ -115,12 +123,16 @@
             display: none;
             position: relative;
             z-index: 2;
-            max-width: 800px;
+            max-width: 90%;
+            width: 100%;
             margin: 0 auto;
-            top: 50%;
-            transform: translateY(-50%);
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            padding: 0 1rem;
         }
 
         .thank-you-text,
@@ -129,22 +141,23 @@
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            max-width: 100%;
         }
 
         .thank-you-text {
-            font-size: 2.5rem;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             line-height: 1.4;
             margin-bottom: 1rem;
         }
 
         .philosopher-text {
-            font-size: 1.8rem;
-            margin: 1.5rem 0;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            margin: 1rem 0;
             color: #ccc;
         }
 
         .certificate-text {
-            font-size: 1.5rem;
+            font-size: clamp(1rem, 3vw, 1.5rem);
             margin: 1rem 0;
             color: #aaa;
         }
@@ -152,17 +165,19 @@
         .claim-button {
             display: inline-block;
             margin-top: 1.5rem;
-            padding: 1rem 2rem;
+            padding: clamp(0.8rem, 3vw, 1rem) clamp(1.5rem, 4vw, 2rem);
             background: rgba(17, 17, 17, 0.5);
             border: 1px solid rgba(68, 68, 68, 0.5);
             color: #fff;
             font-family: 'VT323', monospace;
-            font-size: 1.4rem;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
             cursor: pointer;
             text-decoration: none;
             opacity: 0;
             transform: translateY(20px);
             transition: background 0.3s, transform 0.2s, opacity 0.8s ease-out;
+            max-width: 100%;
+            text-align: center;
         }
 
         .claim-button:hover {
@@ -174,6 +189,105 @@
         .initial-load .answer {
             opacity: 0;
             transform: translateY(40px);
+        }
+
+        /* Tablet styles */
+        @media (min-width: 768px) {
+            .pixel {
+                width: 3px;
+                height: 3px;
+            }
+
+            #quiz {
+                max-width: 600px;
+                padding: 1.5rem;
+            }
+
+            .answer {
+                max-width: 420px;
+                margin: 0.6rem auto;
+            }
+
+            .ending-screen {
+                max-width: 600px;
+                padding: 1.5rem;
+            }
+
+            .philosopher-text {
+                margin: 1.5rem 0;
+            }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            #quiz {
+                max-width: 800px;
+                padding: 2rem;
+            }
+
+            .ending-screen {
+                max-width: 800px;
+                padding: 2rem;
+            }
+
+            #question {
+                margin-bottom: 2rem;
+            }
+
+            .answer {
+                margin: 0.5rem auto;
+            }
+
+            body {
+                overflow: hidden;
+            }
+        }
+
+        /* Large desktop styles */
+        @media (min-width: 1440px) {
+            .pixel {
+                width: 4px;
+                height: 4px;
+            }
+        }
+
+        /* Mobile landscape orientation */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #quiz,
+            .ending-screen {
+                min-height: auto;
+                padding: 0.5rem;
+            }
+
+            #question {
+                margin-bottom: 1rem;
+            }
+
+            .answer {
+                margin: 0.3rem auto;
+                padding: 0.5rem 0.8rem;
+            }
+
+            .claim-button {
+                margin-top: 1rem;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 320px) {
+            .answer {
+                padding: 0.6rem 0.7rem;
+            }
+
+            #quiz,
+            .ending-screen {
+                padding: 0.8rem;
+            }
+        }
+
+        /* Reduce star count on smaller screens for performance */
+        @media (max-width: 768px) {
+            /* JavaScript will handle this */
         }
     </style>
 </head>
@@ -283,7 +397,15 @@
         let animationsComplete = false;
         let isFirstLoad = true;
 
-        const STAR_COUNT = 250;
+        // Responsive star count based on screen size
+        const getStarCount = () => {
+            const width = window.innerWidth;
+            if (width < 768) return 150; // Mobile
+            if (width < 1024) return 200; // Tablet
+            return 250; // Desktop
+        };
+
+        const STAR_COUNT = getStarCount();
         const starField = document.getElementById('stars');
         for (let i = 0; i < STAR_COUNT; i++) {
             const s = document.createElement('div');
@@ -299,6 +421,20 @@
                 document.body.classList.remove('initial-load');
                 loadQuestion();
             }, 300);
+        });
+
+        // Handle orientation changes and screen resizing
+        window.addEventListener('resize', () => {
+            // Debounce resize events
+            clearTimeout(window.resizeTimeout);
+            window.resizeTimeout = setTimeout(() => {
+                // Re-position stars if needed
+                const stars = document.querySelectorAll('.pixel');
+                stars.forEach(star => {
+                    star.style.top = Math.random() * 100 + 'vh';
+                    star.style.left = Math.random() * 100 + 'vw';
+                });
+            }, 250);
         });
 
         function updateButtonText(button, newText, callback) {
@@ -438,7 +574,7 @@
 
         function showEndingScreen() {
             document.getElementById('quiz').style.display = 'none';
-            document.getElementById('ending').style.display = 'block';
+            document.getElementById('ending').style.display = 'flex';
 
             const thankYou = document.querySelector('.thank-you-text');
             const philosopher = document.querySelector('.philosopher-text');
