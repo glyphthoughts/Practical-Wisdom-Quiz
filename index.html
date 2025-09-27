@@ -7,7 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 
     <style>
-        /* Text selection disable + reset */
         * {
             margin: 0;
             padding: 0;
@@ -26,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* Dimmer stars */
         .pixel {
             position: absolute;
             width: 3px;
@@ -50,7 +48,6 @@
             }
         }
 
-        /* Quiz container */
         #quiz {
             position: relative;
             z-index: 2;
@@ -91,7 +88,6 @@
             overflow: hidden;
         }
 
-        /* Button text container for smooth transitions */
         .answer-text {
             opacity: 1;
             transition: opacity 0.4s ease-out;
@@ -101,7 +97,6 @@
             opacity: 0;
         }
 
-        /* Disabled state for buttons */
         .answer.disabled {
             cursor: not-allowed !important;
             opacity: 0.3 !important;
@@ -116,7 +111,6 @@
             border: 1px solid rgba(255, 255, 255, 0.3) !important;
         }
 
-        /* Ending screen */
         .ending-screen {
             display: none;
             position: relative;
@@ -176,7 +170,6 @@
             transform: translateY(-2px);
         }
 
-        /* Initial loading state */
         .initial-load #question,
         .initial-load .answer {
             opacity: 0;
@@ -186,10 +179,8 @@
 </head>
 
 <body class="initial-load">
-    <!-- Stars -->
     <div id="stars"></div>
 
-    <!-- Quiz -->
     <div id="quiz">
         <div id="question">Loading...</div>
         <button class="answer disabled" onclick="selectAnswer(this, 0)">
@@ -203,7 +194,6 @@
         </button>
     </div>
 
-    <!-- Ending Screen -->
     <div id="ending" class="ending-screen">
         <div class="thank-you-text">Thank you for taking the quiz</div>
         <div class="philosopher-text">You are a great thinker</div>
@@ -212,7 +202,6 @@
     </div>
 
     <script>
-        /* Quiz Questions Data */
         const questionsOriginal = [
             {
                 title: "Facing Daily Obstacles",
@@ -279,7 +268,6 @@
             }
         ];
 
-        /* Shuffle function - Fisher-Yates algorithm */
         function shuffleArray(array) {
             const shuffled = [...array];
             for (let i = shuffled.length - 1; i > 0; i--) {
@@ -295,7 +283,6 @@
         let animationsComplete = false;
         let isFirstLoad = true;
 
-        /* Generate dimmer stars */
         const STAR_COUNT = 250;
         const starField = document.getElementById('stars');
         for (let i = 0; i < STAR_COUNT; i++) {
@@ -307,9 +294,7 @@
             starField.appendChild(s);
         }
 
-        /* PAGE LOAD ANIMATIONS */
         window.addEventListener('load', () => {
-            // Remove initial loading class after a brief delay
             setTimeout(() => {
                 document.body.classList.remove('initial-load');
                 loadQuestion();
@@ -319,15 +304,13 @@
         function updateButtonText(button, newText, callback) {
             const textSpan = button.querySelector('.answer-text');
 
-            // Fade out current text
             textSpan.classList.add('fade-out');
 
-            // Change text and fade in after fade out completes
             setTimeout(() => {
                 textSpan.textContent = newText;
                 textSpan.classList.remove('fade-out');
                 if (callback) callback();
-            }, 400); // Match the CSS transition duration
+            }, 400);
         }
 
         function loadQuestion() {
@@ -337,14 +320,11 @@
             const buttons = document.querySelectorAll('.answer');
             const q = questions[currentQuestion];
 
-            // Disable buttons initially
             buttons.forEach(btn => btn.classList.add('disabled'));
 
             if (isFirstLoad) {
-                // First load: everything starts from initial positions and fades in
                 isFirstLoad = false;
 
-                // Set initial content
                 questionEl.textContent = `${q.title} — ${q.question}`;
                 buttons.forEach((btn, index) => {
                     const textSpan = btn.querySelector('.answer-text');
@@ -352,7 +332,6 @@
                     btn.classList.remove('selected');
                 });
 
-                // Animate everything in smoothly
                 setTimeout(() => {
                     questionEl.style.opacity = '1';
                     questionEl.style.transform = 'translateY(0)';
@@ -363,7 +342,6 @@
                         btn.style.opacity = '1';
                         btn.style.transform = 'translateY(0)';
 
-                        // Enable buttons after all animations complete
                         if (index === buttons.length - 1) {
                             setTimeout(() => {
                                 buttons.forEach(button => {
@@ -376,9 +354,6 @@
                 });
 
             } else {
-                // Subsequent loads: fade in with text transition
-
-                // Reset positions
                 questionEl.style.opacity = '0';
                 questionEl.style.transform = 'translateY(20px)';
                 buttons.forEach(btn => {
@@ -387,14 +362,12 @@
                     btn.classList.remove('selected');
                 });
 
-                // Update question
                 setTimeout(() => {
                     questionEl.textContent = `${q.title} — ${q.question}`;
                     questionEl.style.opacity = '1';
                     questionEl.style.transform = 'translateY(0)';
                 }, 300);
 
-                // Update buttons with smooth text transitions
                 let completedAnimations = 0;
                 buttons.forEach((btn, index) => {
                     setTimeout(() => {
