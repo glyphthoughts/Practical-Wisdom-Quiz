@@ -604,6 +604,39 @@
             window.location.href = 'https://glyphthoughts.github.io/Practical-Wisdom-Certificate-Generation-Model';
         }
     </script>
+    <!-- Analytics Tracking -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getDatabase, ref, push } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBqj11JuvxpKFd0I6VD3vzO0Ql148uFc_U",
+    authDomain: "glyphthoughts-analytics.firebaseapp.com",
+    databaseURL: "https://glyphthoughts-analytics-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "glyphthoughts-analytics",
+    storageBucket: "glyphthoughts-analytics.firebasestorage.app",
+    messagingSenderId: "803370891175",
+    appId: "1:803370891175:web:6139f3003ef2ea96e56882"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  const projectName = 'projects/Practical Wisdom';
+  
+  const visitsRef = ref(database, 'visits/' + projectName.replace('/', '-'));
+  
+  push(visitsRef, {
+    timestamp: Date.now(),
+    page: window.location.pathname,
+    referrer: document.referrer || 'direct',
+    userAgent: navigator.userAgent,
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height,
+    category: projectName.split('/')[0],
+    project: projectName.split('/')[1]
+  });
+</script>
 </body>
 
 </html>
